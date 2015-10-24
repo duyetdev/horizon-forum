@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
  
 from horizon import tables
  
-from openstack_dashboard.dashboards.integra.providers import utils
+from openstack_dashboard.dashboards.forum.post import utils
  
 class AddTableData(tables.LinkAction):
     name = "add"
@@ -34,6 +34,7 @@ class PostTable(tables.DataTable):
                           verbose_name=_("Id"))
  
     title = tables.Column("title",
+			 link="horizon:forum:post:view",
                           verbose_name=_("Title"))
 
     content = tables.Column("content",
