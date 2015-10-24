@@ -22,17 +22,25 @@ class SetAddPostDetailsAction(workflows.Action):
     status = forms.ChoiceField (
         label=_("Status"),
         required=True,
+        widget=forms.Select(),
+        choices=(
+            (1, _("Active")),
+            (2, _("Lock"))
+        ),
         help_text=_("Status post"))
 
 
     class Meta:
-        name = _("Details")
+        name = _("New")
  
     def __init__(self, request, context, *args, **kwargs):
         self.request = request
         self.context = context
-        super(SetPostDetailsAction, self).__init__(
+        super(SetAddPostDetailsAction, self).__init__(
             request, context, *args, **kwargs)
+
+        # Set our user options
+        # self.fields['owner'].default = request.user.id
  
 class SetAddPostDetails(workflows.Step):
     action_class = SetAddPostDetailsAction
@@ -47,7 +55,7 @@ class SetAddPostDetails(workflows.Step):
  
 class AddPost(workflows.Workflow):
     slug = "add"
-    name = _("Add")
+    name = _("Add new post")
     finalize_button_name = _("Add")
     success_message = _('Added provider "%s".')
     failure_message = _('Unable to add post "%s".')
