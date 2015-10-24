@@ -7,12 +7,14 @@ from requests.auth import HTTPBasicAuth
 from django.template.defaultfilters import register
 from django.utils.translation import ugettext_lazy as _
 import requests
+import time
+from random import randint
  
 from horizon import exceptions
  
 requests.packages.urllib3.disable_warnings()
  
-forum_url = "https://localhost:8443/rest"
+forum_url = "http://188.166.237.75/api"
 json_headers = {'Accept': 'application/json'}
  
 class Post:
@@ -20,20 +22,25 @@ class Post:
     Post data
     """
  
-    def __init__(self, id, title, content):
+    def __init__(self, id, title, content, created_at, owner):
         self.id = id
         self.title = title
         self.content = content
+        self.created_at = created_at
+        self.owner = owner
+	self.active = True
  
 def getPosts(self):
     try:
         r = requests.get(forum_url + "/post", verify=False, auth=HTTPBasicAuth('admin', 'forum'), headers=json_headers)
  
-        post = []
-        for post in r.json()['post']:
-            post.append(Post(post[u'id'], post[u'title'], post[u'content']))
+        print (r.json())
+
+        posts = []
+        for post in r.json():
+            posts.append(Post(post[u'id'], post[u'title'], post[u'content'], post[u'created_at'], post[u'owner']))
  
-        return post
+        return posts
  
     except:
         exceptions.handle(self.request,
@@ -44,12 +51,14 @@ def getPosts(self):
 # context - user inputs from form
 def addPost(self, request, context):
     try:
- 
+        _id = randint(0,999)
         title = context.get('title')
         content = context.get('content')
+        owner = request.user.username
+        created_at = time.strftime("%c")
  
-        payload = {'title': title, 'content': content}
-        requests.post(forum_url + "/post", json=payload, verify=False, auth=HTTPBasicAuth('admin', 'forum'), headers=json_headers)
+        payload = {'id': _id,  'title': title, 'content': content, 'owner': owner, 'created_at': created_at}
+        requests.post(forum_url + "/post", json=payload, verify=False, headers=json_headers)
  
     except:
         print "Exception inside utils.addPost"
